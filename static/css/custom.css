@@ -1,0 +1,33 @@
+span.lnt {
+    display: block;
+    max-width: 3rem;
+}
+
+span.ln {
+    margin-right: 1rem;
+}
+
+.hljs {
+    padding: 0.5rem;
+}
+
+td.lntd {
+    padding: 0 0 0 0;
+}
+
+table {
+    margin: 0rem;
+}
+
+
+pre {
+    margin: 0 1rem 1rem 0;
+}
+
+pre code {
+    padding: 0.5rem;
+}
+
+.navbar {
+    margin-top: 0;
+}

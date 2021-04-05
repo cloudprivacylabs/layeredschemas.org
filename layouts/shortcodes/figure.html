@@ -1,0 +1,7 @@
+{{ $src := .Get "src" }}
+{{ $width := .Get "width" }}
+{{ $height := .Get "height" }}
+<figure{{ with .Get "class" }} class="{{.}}"{{ end }}>
+  <img class="img-fluid lazyload blur-up" data-sizes="auto" src="{{$src}}" width="{{ $width }}" height="{{ $height }}" {{ with .Get "alt" }}alt="{{.}}"{{ end }}>
+  {{ with .Get "caption" }}<figcaption class="figure-caption">{{ . | safeHTML }}</figcaption>{{ end }}
+</figure>

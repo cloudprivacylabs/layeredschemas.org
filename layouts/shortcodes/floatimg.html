@@ -1,0 +1,9 @@
+{{ $src := .Get "src" }}
+{{ $width := .Get "width" }}
+{{ $height := .Get "height" }}
+{{ $class := .Get "class" }}
+{{ $float := .Get "float" }}
+<div class="{{$float}}">
+  <img class="{{$class}}" data-sizes="auto" src="{{$src}}" width="{{ $width }}" height="{{ $height }}" {{ with .Get "alt" }}alt="{{.}}"{{ end }}>
+</div>
+
