@@ -4,7 +4,7 @@ weight: 1
 menu:
   docs:
     parent: introduction
-
+draft: true
 ---
 
 Layered Schemas is developed to help machines understand the

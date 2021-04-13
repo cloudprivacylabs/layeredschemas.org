@@ -1,19 +1,23 @@
 [[docs]]
   name = "Introduction"
   identifier = "introduction"
-  url = "/docs/introduction"
+  url = "/docs/overview"
   weight = 1
 
 [[docs]]
-  name = "Reference"
-  identifier = "reference"
+  name = "Specification <sup>v1.0.0-alpha</sup>"
+  identifier = "spec"
   url = "/docs"
   weight = 20
 
 [[main]]
   name = "Docs"
-  url = "/docs/introduction"
+  url = "/docs/overview"
   weight = 10
+[[main]]
+  name = "Downloads"
+  url = "/downloads"
+  weight = 30
 [[main]]
   name = "Contact"
   url = "/contact"

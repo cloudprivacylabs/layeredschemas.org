@@ -17,11 +17,12 @@ boxes:
 
 {{<figure src="layered-schemas-flow.png" class="text-center">}}
 
-Layered schema architecture is developed to work with unified data
-semantics regardless of the data capture locale, representation,
-encoding, format, or ontology. It enables semantic processing of data
-coming from heterogeneous sources by using a linked data
-representation enriched with metadata.
+Layered schema technology enables unified data semantics to improve
+interoperability between heterogeneous systems for data capture,
+processing, and exchange. It uses a schema to specify the data
+elements and their translation to linked data. Interchangeable
+overlays deal with the variability due to differences in data capture
+conventions, jurisdictions, locale, vendors, or other reasons.
 
 Traditional schemas (such as JSON/XML schemas) describe the structure
 of data with limited semantic information. Layered schemas use
@@ -35,39 +36,36 @@ schema are:
  * Privacy classifications: Personally identifiable information, sensitive information,...
  * Retention policies: Attributes must be cleared after a period,...
  * Provenance: Data source, signatures, ...
+ 
+Layered schema architecture provides the framework that enables
+applications to extend this list by adding new terms and semantics.
 
 {{<figure src="slice-compose.png" class="text-center">}}
 
 A schema can be "sliced" into a base schema layer and multiple
 overlays. The schema base contains minimal structural information and
 a unified terminology for the data. Each **overlay** adds metadata to
-enrich descriptions of data elements. These layers can be replaced
-with others representing variations to stuctural constraints,
-different languages or notational differences based on locale,
-different security constraints based on context, and more. The layers
-are then composed to build a new schema that can produce a new
-variation of the underlying data. These are transparent to the data
+enrich descriptions of data elements. These overlays are
+interchangeable to account for the variations in constraints,
+languages, notational differences, and more. A schema and a set of
+overlays are composed to build a new schema variant that can process a
+certain variation of data. These are transparent to the data
 processing application, so variations in the data sources or data
 targets are not "hardwired" into the application logic.
 
-Layered schemas can be used in a family of architectures with the
-following components:
+Layered schema architecture includes the following components:
 
-  * The Layered Schema Specification (Apache License 2.0): Defines the
-    ontology, data model, semantics, and the algorithms,
-  * The schema compiler (Apache License 2.0): The toolset and the
+  * Schema compiler (Apache License 2.0): The toolset and the
     associated library to import, slice, compose layered schemas, and
     import/export data using them
-  * Schema repository: A central, or decentralized schema storage
-    engine that composes the required variants of schemas based on the
-    context. 
-  * Form processor: The form processor builds data entry forms from a
-    schema, and them processes data entered using those forms and
-    translates them into linked data. The form processor may define an
+  * Schema repository: A central or decentralized schema storage
+    engine that resolves references to schemas based on the context.
+  * Form processor: Builds data entry forms from a schema, and
+    translates entered data to linked data. The form processor uses an
     ontology of terms to customize how data entry forms are generated.
-  * Semantic processor: This component helps working with linked
-    data. It allows an application to run semantic queries on ingested
-    data elements and modify them as necessary.
+  * Semantic processor: Helps working with linked data by evaluating
+    semantic queries and operations. Applications can extend the
+    semantic processor by defining new terms and their operations.
 
 ## Data Capture
 

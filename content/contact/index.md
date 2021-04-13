@@ -7,8 +7,9 @@ draft: false
 images: []
 ---
 
-Send us an email to learn more about layered schemas technology and we
-will be in touch as soon as possible
+Contact us to learn more about layered schemas. We can help you
+integrate layered schemas into your applications and provide scalable
+components customized for your specific use cases.
 
 Cloud Privacy Labs <br>
 5500 Greenwood Plaza Blvd<br>

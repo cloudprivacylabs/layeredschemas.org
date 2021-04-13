@@ -1,40 +1,12 @@
 ---
 title: "Definitions"
-weight: 5
+weight: 100
 menu:
   docs:
-    parent: reference
+    parent: spec
 
 ---
 
-## Schema base
-
-A schema base is a schema layer that specifies the structure of the
-data object defined by the schema. A schema base is defined by 
-
-```
-{
-  "@type": "http://layeredschemas.org/Schema",
-  "http://layeredschemas.org/Schema.attributes": [
-    ...
-  ]
-}
-```
-
-or
-
-```
-{
-  "@context:"http://layeredschemas.org/schema.jsonld",
-  "@type": "Schema",
-  "attributes": {
-    ...
-  }
-}
-```
-
-Variations of a schema can be composed by adding different overlays to
-a schem.
 
 ## Strong reference
 

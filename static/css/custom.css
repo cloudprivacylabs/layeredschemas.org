@@ -26,8 +26,13 @@ pre {
 
 pre code {
     padding: 0.5rem;
+    background: WhiteSmoke;
 }
 
 .navbar {
     margin-top: 0;
+}
+
+.docs-links h3 {
+    text-transform: none;
 }
