@@ -44,5 +44,4 @@ pinhead*
 RPMS
 dbdata/*
 go.sum
-resources/_gen
 public/
