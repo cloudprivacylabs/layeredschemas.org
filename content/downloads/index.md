@@ -21,4 +21,5 @@ model in Go language. `Layers` can be used for the following tasks:
 Repository: [https://github.com/cloudprivacylabs/lsa](https://github.com/cloudprivacylabs/lsa)
 
 Releases: 
+ * 1.0.0-alpha-20210414: [https://github.com/cloudprivacylabs/lsa/releases/tag/1.0.0-alpha-20210414](https://github.com/cloudprivacylabs/lsa/releases/tag/1.0.0-alpha-20210414)
  * 1.0.0-alpha: [https://github.com/cloudprivacylabs/lsa/releases/tag/1.0.0-alpha](https://github.com/cloudprivacylabs/lsa/releases/tag/1.0.0-alpha)
