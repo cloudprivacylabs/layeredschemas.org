@@ -26,6 +26,24 @@ following structure:
   ]
 }
 ```
+Or:
+
+```
+{
+  "@context": "http://layeredschemas.org/v1.0/ls.jsonld",
+  "@type": "Schema", or "Overlay",
+  "@id": "http://layeredschemas.org/exampleSchema",
+  "objectType": "http://example.org/SomeObject",
+  "attributeList": [
+    {
+      "@id": "attribute id",
+      "@type": "Value",
+      .. // other annotations
+    },
+    ...
+  ]
+}
+```
 
 ## `@context`
 
@@ -74,10 +92,8 @@ other layer.
 `@container: @id`<br>
 
 The attributes of the object defined by this schema. It is an idmap,
-so attributes can be defined as an array of attributes if ordering is
-significant, or as a JSON object. That is, the following two
-definitions are valid, with the difference that the first one
-guarantees consistent ordering of the attributes in the schema.
+so attributes can be defined as an array of attributes as a JSON
+object. That is, both of the following definitions are valid:
 
 ```
 "attributes": [
@@ -97,6 +113,28 @@ guarantees consistent ordering of the attributes in the schema.
   "attr2": {},
   ...
 }
+```
+
+The order of attributes are not significant, and not necessarily preserved.
+
+## attributeList
+
+`@id: http://layeredschemas.org/Object/attributeList`<br>
+`@container: @list`<br>
+
+The attributes of the object defined by this schema. A schema can either have `attributes` or `attributeList`.
+`attributeList` is a list container, meaning the ordering of attributes are significant:
+
+```
+"attributeList": [
+  { 
+    "@id": "attr1"
+  },
+  { 
+    "@id": "attr2" 
+  },
+  ...
+]
 ```
 
 Layered schema support the following types of attributes:
