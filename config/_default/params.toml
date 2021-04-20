@@ -5,7 +5,7 @@ title = "Layered Schemas"
 #logoImg = "/images/cpl-logo-horizontal-160x32.png"
 titleSeparator = ""
 titleAddition = ""
-description = "Layered schemas: semantic processing for data capture, processing, and exchange. Capture data in multiple languages, improve interoperability, pool data from heterogeneous systems for ELT pipelines, AI, and privacy conscious data exchange"
+description = "Layered schemas architecture enables semantic interoperability for data capture, processing, and exchange."
 
 ## Open Graph + Twitter Cards
 images = ["images/cpl-logo-horizontal-160x32.png"]
