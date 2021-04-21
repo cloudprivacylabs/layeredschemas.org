@@ -10,6 +10,13 @@
   url = "/docs"
   weight = 20
 
+[[docs]]
+  name = "Misc. Documents"
+  identifier = "other"
+  url = "/docs"
+  weight = 30
+
+
 [[main]]
   name = "Docs"
   url = "/docs/overview"
