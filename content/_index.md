@@ -1,18 +1,23 @@
 ---
 title : "Layered Schemas for data capture, processing, and exchange"
-lead: "Enable semantic processing for data. Improve interoperability between heterogeneous systems."
-date: 2020-10-06T08:47:36+00:00
-lastmod: 2020-10-06T08:47:36+00:00
+lead: "Enable semantic processing for structured data. Improve interoperability between heterogeneous systems."
+date: 2021-04-20T08:47:36+00:00
+lastmod: 2021-04-20T20:24:36+00:00
 draft: false
 images: []
 boxes: 
-#  - title: Data Capture
-#    content: |
-#      A schema defines the underlying data elements. Interchangeable overlays add the necessary variations for language, formatting, and encoding. 
+  -  title: Linked Data
+     content: |
+       Traditional schemas define the structure of data. Layered schemas define an abstract data model as linked data.
       
-#  - title: Format independence
-#    content: |
-#      Layered schemas architecture treat all structured data as linked data. 
+  - title: Interoperability
+    content: |
+      Interchangeable overlays deal with variations in representation, format, language, semantics, etc.
+      
+  - title: Multi-dimensional Metadata
+    content: |
+      Open-ended semantic annotations for security/privacy attributes, retention policies, data provenance, etc.
+      
 ---
 
 {{<figure src="layered-schemas-flow.png" class="text-center">}}
