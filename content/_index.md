@@ -12,11 +12,11 @@ boxes:
       
   - title: Interoperability
     content: |
-      Interchangeable overlays deal with variations in representation, format, language, semantics, etc.
+      Interchangeable overlays deal with variations in representation, format, locale, semantics, and more.
       
   - title: Multi-dimensional Metadata
     content: |
-      Open-ended semantic annotations for security/privacy attributes, retention policies, data provenance, etc.
+      Open-ended semantic annotations for security/privacy attributes, retention policies, data provenance, and more.
       
 ---
 

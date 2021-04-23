@@ -8,7 +8,7 @@ titleAddition = ""
 description = "Layered schemas architecture enables semantic interoperability for data capture, processing, and exchange."
 
 ## Open Graph + Twitter Cards
-images = ["images/cpl-logo-horizontal-160x32.png"]
+images = ["layered-schemas-flow.png"]
 twitterSite = "CPrivacyLabs"
 twitterCreator = "CPrivacyLabs"
 facebookAuthor = "CloudPrivacyLabs"
@@ -17,7 +17,7 @@ ogLocale = "en_US"
 
 ## JSON-LD
 schemaType = "Organization"
-schemaLogo = "images/cpl-logo-horizontal-160x32.png"
+schemaLogo = "layered-schemas-flow.png"
 schemaTwitter = "https://twitter.com/CPrivacyLabs"
 schemaLinkedIn = "https://www.linkedin.com/company/cloud-privacy-labs/about/"
 schemaGitHub = "https://github.com/cloudprivacylabs"
