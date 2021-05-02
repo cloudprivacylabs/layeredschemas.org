@@ -5,6 +5,7 @@ menu:
   docs:
     parent: introduction
 toc: false
+description: An overview of layered schemas, examples, syntax, composing and slicing
 ---
 
 A **schema** describes data. This is a JSON schema:

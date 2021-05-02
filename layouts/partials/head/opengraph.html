@@ -27,8 +27,8 @@
   {{ end -}}
 {{ end -}}
 
-{{ $iso8601 := "2006-01-02T15:04:05-07:00" -}}
-{{ if .IsPage -}}
+ {{ $iso8601 := "2006-01-02T15:04:05-07:00" -}}
+  {{if .Page}}
   {{ if not .PublishDate.IsZero -}}
     <meta property="article:published_time" {{ .PublishDate.Format $iso8601 | printf "content=%q" | safeHTMLAttr }}>
   {{ else if not .Date.IsZero -}}
@@ -37,12 +37,31 @@
   {{ if not .Lastmod.IsZero -}}
     <meta property="article:modified_time" {{ .Lastmod.Format $iso8601 | printf "content=%q" | safeHTMLAttr }}>
   {{ end -}}
-{{ else -}}
-  {{ if not .Date.IsZero -}}
+  {{ if not .PublishDate.IsZero -}}
+    <meta property="og:updated_time" {{ .PublishDate.Format $iso8601 | printf "content=%q" | safeHTMLAttr }}>
+  {{ else if not .Date.IsZero -}}
+    <meta property="og:updated_time" {{ .Date.Format $iso8601 | printf "content=%q" | safeHTMLAttr }}>
+  {{ else if not .Lastmod.IsZero -}}
     <meta property="og:updated_time" {{ .Lastmod.Format $iso8601 | printf "content=%q" | safeHTMLAttr }}>
   {{ end -}}
-{{ end -}}
-
+    {{else}}
+    {{ if not .Params.publishDate.IsZero -}}
+    <meta property="article:published_time" {{ .PublishDate.Format $iso8601 | printf "content=%q" | safeHTMLAttr }}>
+  {{ else if not .Params.date.IsZero -}}
+    <meta property="article:published_time" {{ .Date.Format $iso8601 | printf "content=%q" | safeHTMLAttr }}>
+  {{ end -}}
+  {{ if not .Params.Lastmod.IsZero -}}
+    <meta property="article:modified_time" {{ .Lastmod.Format $iso8601 | printf "content=%q" | safeHTMLAttr }}>
+  {{ end -}}
+  {{ if not .PublishDate.IsZero -}}
+    <meta property="og:updated_time" {{ .PublishDate.Format $iso8601 | printf "content=%q" | safeHTMLAttr }}>
+  {{ else if not .Date.IsZero -}}
+    <meta property="og:updated_time" {{ .Date.Format $iso8601 | printf "content=%q" | safeHTMLAttr }}>
+  {{ else if not .Lastmod.IsZero -}}
+    <meta property="og:updated_time" {{ .Lastmod.Format $iso8601 | printf "content=%q" | safeHTMLAttr }}>
+  {{ end -}}
+{ {{end}}
+    
 {{ with .Params.audio -}}
   <meta property="og:audio" content="{{ . }}">
 {{ end -}}

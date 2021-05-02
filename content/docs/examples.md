@@ -16,10 +16,10 @@ Here is a simple schema with two attributes:
 
 ```
 {
-  "@context": "http://layeredschemas.org/v1.0/ls.jsonld",
+  "@context": "http://layeredschemas.org/ls.jsonld",
   "@type": "Schema",
   "@id": "http://example.org/Example/schema",
-  "objectType": "http://example.org/Example",
+  "targetType": "http://example.org/Example",
   "attributes": {
     "attr1": {
        "@type" : "Value"
@@ -57,10 +57,10 @@ Now let's add the following layer:
 
 ```
 {
-  "@context": "http://layeredschemas.org/v1.0/ls.jsonld",
+  "@context": "http://layeredschemas.org/ls.jsonld",
   "@type": "Overlay",
   "@id": "http://example.org/Example/schema/typeOverlay",
-  "objectType": "http://example.org/Example",
+  "targetType": "http://example.org/Example",
   "attributes": {
     "attr1": {
        "@type": "Value",

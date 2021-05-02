@@ -1,5 +1,5 @@
 ---
-title: "Composing Layers"
+title: "Operations on Layers"
 weight: 50
 menu:
   docs:
@@ -7,15 +7,17 @@ menu:
 
 ---
 
+## Composition 
+
 Composition operation combines layers to create a new variant of a
 schema, or to create a new overlay that is a combination of several
 overlays. When composing layers, an overlay can be added into a schema or
 another overlay. A schema cannot be composed with another schema. 
 
-When composing schema layers, all layers
-must agree on the `objectType`. That means, all non-empty object types
-must agree. A layer without an object type can be composed with any
-layer.
+When composing schema layers, all layers must agree on the
+`targetType`. That means, all non-empty target types must have
+nonempty intersections. A layer without a target type can be composed
+with any layer.
 
 The following are valid compositions:
 
@@ -26,7 +28,7 @@ The result is an overlay for `object`.
  * `Schema(object) + Overlay_1 + Overlay_2(object)`
 The result is a schema for object. The first overlay can be composed with the schema because it is not declared for a particular object type. 
 
-## Options
+### Options
 
 The composition algorithm uses an `options` parameter containing the
 following options:
@@ -36,7 +38,7 @@ following options:
     attributes that are not in the target layer but that exist in the
     source layer will be added to the target layer.
     
-## Terms
+### Composing Terms
     
 A key part of the algorithm is composing the values of terms included
 in the attribute. It should be possible for an implementation to
@@ -56,7 +58,7 @@ attribute `A`.
       * `B[t]`, if `B[t]` is not nil
       
       
-### Examples
+#### Examples
 
 Set/List composition:
 
@@ -103,7 +105,7 @@ Composition of B and A: {
 }
 ```
 
-## Layers
+### Algorithm
 
 In the following algorithm to compute composition of layers, the
 `attr.path` refers to the sequence of `@id`s of attributes starting from
@@ -201,4 +203,96 @@ ComposeAttribute(options,target,source)
     Array: ComposeAttribute(options,target.items,source.items)
     Composite: ComposeAttribute for all matching attributes
     Polymorphic: ComposeAttribute for all matching attributes
+```
+
+## Slicing
+
+Slicing operation creates new layers from an existing layer by
+selecting a subset of the terms. It uses an `accept` operation that
+selects the terms that will be included in the output.
+
+### Algorithm
+
+```
+SliceAttribute(attr,accept)
+  newAttribute:= new Attribute
+  For each (term, value) in attr
+    If accept(term)
+      newAttribue[term]=value
+  
+  If attr is one of Object, Array, Composite, Polymorphic
+    For each nestedComponent under attr
+      SliceAttribute(nestedComponent,accept)
+      
+  If newAttribute is not empty, return newAttribute
+```
+
+### Example
+
+Consider the following layer:
+```
+"attributes": {
+  "attr1": {
+     "@type": "Value",
+     "format": "url",
+     "privacyClassifications": ["PII"]
+  },
+  "attr2": {
+    "@type": "Object",
+    "attributes": {
+       "attr3": {
+         "@type": "Value",
+         "privacyClassifications": ["BIT"]
+       }
+    }
+  }
+}
+```
+
+Slicing this schema with an `accept` function that only accepts
+`attributes`, `items`, `allOf`, `oneOf`, and `reference`:
+
+```
+"attributes": {
+  "attr1": {
+     "@type": "Value",
+  },
+  "attr2": {
+    "@type": "Object",
+    "attributes": {
+       "attr3": {
+         "@type": "Value"
+       }
+    }
+  }
+}
+```
+
+Slicing this schema with an `accept` function that accepts `format`:
+```
+"attributes": {
+  "attr1": {
+     "@type": "Value",
+     "format": "url",
+  }
+}
+```
+
+Slicing this schema with an `accept` function that accepts `privacyClassifications`:
+```
+"attributes": {
+  "attr1": {
+     "@type": "Value",
+     "privacyClassifications": ["PII"]
+  },
+  "attr2": {
+    "@type": "Object",
+    "attributes": {
+       "attr3": {
+         "@type": "Value",
+         "privacyClassifications": ["BIT"]
+       }
+    }
+  }
+}
 ```
