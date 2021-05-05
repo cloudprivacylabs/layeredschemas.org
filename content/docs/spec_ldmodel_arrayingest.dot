@@ -1,0 +1,16 @@
+digraph g {
+  rankdir="LR";
+  schId [label="attrId"];
+  Type1 [label="ls:Array"];
+  Type2 [label="<targetType>"];
+  item1 [label="arrayId[0]"];
+  item2 [label="arrayId[1]"];
+  item3 [label="arrayId[2]"];
+
+  arrayId -> Type1 [label="@type"];
+  arrayId -> Type2 [label="@type"];
+  arrayId -> schId [label="ls:schemaRef"];
+  arrayId -> item1 [label="ls:items"];
+  arrayId -> item2 [label="ls:items"];
+  arrayId -> item3 [label="ls:items"];
+}

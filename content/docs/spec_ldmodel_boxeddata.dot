@@ -1,0 +1,6 @@
+digraph g{
+  rankdir="LR";
+
+  object -> key [label="ls:attributes"];
+  key -> value [label="ls:value"];
+}

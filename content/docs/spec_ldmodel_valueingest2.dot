@@ -1,0 +1,13 @@
+digraph g {
+  rankdir="LR";
+  schId [label="attrId"];
+  Type1 [label="ls:Value"];
+  Type2 [label="<targetType>"];
+
+  valueId -> Type1 [label="@type"];
+  valueId -> Type2 [label="@type"];
+  valueId -> schId [label="ls:schemaRef"];
+  valueId -> value [label="ls:value"];
+  value -> Type2 [label="@type"];
+  value -> schId [label="ls:schemaRef"];
+}

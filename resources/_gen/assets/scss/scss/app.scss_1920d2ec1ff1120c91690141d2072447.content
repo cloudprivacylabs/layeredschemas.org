@@ -9855,7 +9855,6 @@ pre code::-webkit-scrollbar-thumb:hover {
   background: #e9ecef; }
 
 .alert {
-  font-family: "Courier New", monospace, sfmono-regular, menlo, monaco, consolas, "Liberation Mono";
   font-size: 0.875rem; }
 
 .alert-icon {

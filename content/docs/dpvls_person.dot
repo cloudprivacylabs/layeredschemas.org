@@ -1,0 +1,28 @@
+digraph g {
+  rankdir="LR";
+  Person [label="Person"];
+  DataSubject [label="dpv:DataSubject",fillcolor=yellow,style=filled];
+  JohnDoe [label="John Doe"];
+  phoneNum [ label="555-555 5555"];
+  dpvName1 [ label="dpv:Name",fillcolor=yellow,style=filled];
+  dpvIdentifying1 [ label="dpv:Identifying",fillcolor=yellow,style=filled];
+  dpvName2 [ label="dpv:Name",fillcolor=yellow,style=filled];
+  dpvIdentifying2 [ label="dpv:Identifying",fillcolor=yellow,style=filled];
+
+  JohnDoe -> Person [ label="rdfs:type" ];
+  JohnDoe -> DataSubject [ label="rdfs:type" ];
+  JohnDoe -> FirstName [ label="ls:attributes"];
+  FirstName -> dpvName1 [ label="dpv:hasPersonalDataCategory"]
+  FirstName -> dpvIdentifying1 [ label="dpv:hasPersonalDataCategory"]
+  JohnDoe -> LastName [ label="ls:attributes"];
+  LastName -> dpvName2 [ label="dpv:hasPersonalDataCategory"]
+  LastName -> dpvIdentifying2 [ label="dpv:hasPersonalDataCategory"]
+  JohnDoe -> Contact [ label="ls:attributes"];
+  FirstName -> John [ label= "ls:value"];
+  LastName -> Doe [ label="ls:value"];
+  Contact -> Contact_0 [label = "ls:items"];
+  Contact_0 -> type [label="ls:attributes"];
+  Contact_0 -> value [label="ls:attributes"];
+  type -> cell [label="ls:value"];
+  value -> phoneNum [label="ls:value"];
+}

@@ -7,6 +7,12 @@ menu:
 
 ---
 
+{{% status %}}
+This specification is in **alpha** stage. It is still being actively
+developed, but the basic structure is not likely to change. 
+Use the  [GitHub](https://github.com/cloudprivacylabs/lsa-spec) repository to contribute.
+{{% /status %}}
+
 ## Composition 
 
 Composition operation combines layers to create a new variant of a

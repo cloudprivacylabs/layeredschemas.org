@@ -6,6 +6,12 @@ menu:
     parent: spec
 ---
 
+{{% status %}}
+This specification is in **alpha** stage. It is still being actively
+developed, but the basic structure is not likely to change. 
+Use the  [GitHub](https://github.com/cloudprivacylabs/lsa-spec) repository to contribute.
+{{% /status %}}
+
 ## Schemas and Overlays
 
 A layer can either be a `Schema` or an `Overlay`. A layer has the

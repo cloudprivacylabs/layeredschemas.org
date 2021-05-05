@@ -11,7 +11,7 @@
   weight = 20
 
 [[docs]]
-  name = "Misc. Documents"
+  name = "Presentations, How-tos"
   identifier = "other"
   url = "/docs"
   weight = 30
