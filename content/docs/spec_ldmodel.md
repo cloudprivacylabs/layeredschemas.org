@@ -1,5 +1,5 @@
 ---
-title: "Linked Data Model"
+title: "Property Graph Model"
 weight: 60
 menu:
   docs:
@@ -13,13 +13,12 @@ developed, but the basic structure is not likely to change.
 Use the  [GitHub](https://github.com/cloudprivacylabs/lsa-spec) repository to contribute.
 {{% /status %}}
 
-A layered schema defines a linked data model that is not necessarily
-an RDF representation of the input. In general, a **data ingestor**
-component can be built for a specific purpose to translate an input
-object into a specific data model with the help of a layered
-schema. Because of this, it is not possible to specify only one **data
-ingestor**. This specification is for a property graph ingestor. The JSON
-document
+A layered schema defines a linked data model that can be represented
+as a property graph. In general, a **data ingestor** component can be
+built for a specific purpose to translate an input object into a
+specific data model with the help of a layered schema. Because of
+this, it is not possible to specify only one **data ingestor**. This
+specification is for a property graph ingestor. The JSON document
 
 ``` 
 object: {
@@ -33,11 +32,12 @@ will be represented as:
 
 The differences of this representation from an RDF translation are:
 
-  * The layered schema data model does not use blank nodes when
+  * The property graph data model does not use blank nodes when
     representing data objects,
   * The edge attributes can be specified in the schema,
-  * When mapped to RDF triples, all schema attributes are objects and
-    subjects (they are not predicates).
+  * All schema attributes are nodes of the graph (they are not RDF predicates).
+  * Nodes are not necessarily IRIs
+  * Literals are not necessarily strings
 
 ## Ingestion operation
 
