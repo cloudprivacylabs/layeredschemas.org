@@ -17,13 +17,13 @@ Use the  [GitHub](https://github.com/cloudprivacylabs/lsa-spec) repository to co
 
 Composition operation combines layers to create a new variant of a
 schema, or to create a new overlay that is a combination of several
-overlays. When composing layers, an overlay can be added into a schema or
-another overlay. A schema cannot be composed with another schema. 
+overlays. When composing layers, an overlay can be added into a schema
+or another overlay. A schema cannot be composed with another schema.
 
-When composing schema layers, all layers must agree on the
-`targetType`. That means, all non-empty target types must have
-nonempty intersections. A layer without a target type can be composed
-with any layer.
+When composing schema layers, all layers must agree on `@type`. That
+means, the `@type`s of layers excluding the attribute types must have
+nonempty intersections. A layer that has only attribute types can be
+composed with any other layer.
 
 The following are valid compositions:
 
@@ -33,99 +33,90 @@ The result is a schema for `object`.
 The result is an overlay for `object`.
  * `Schema(object) + Overlay_1 + Overlay_2(object)`
 The result is a schema for object. The first overlay can be composed with the schema because it is not declared for a particular object type. 
-
-### Options
-
-The composition algorithm uses an `options` parameter containing the
-following options:
-
-  * `Union = false`: If `false`, only those attributes that exist in
-    the target layer will be in the resulting layer. If `true`,
-    attributes that are not in the target layer but that exist in the
-    source layer will be added to the target layer.
-    
+   
 ### Composing Terms
     
 A key part of the algorithm is composing the values of terms included
 in the attribute. It should be possible for an implementation to
-define terms that specify term-specific composition methods. The
-default composition for terms is as follows: Let `A` and `B` be
-attributes, and let `A[t]` denote the value of the term `t` in
-attribute `A`.
+define terms that specify term-specific composition methods. The term
+composition methods are as follows:
+ 
+  * Set composition: This is the default term composition method. The
+    set composition of two terms is the set union of their values. For
+    example:
 
-  * If `t` is a `@set`, then the composition of `A[t]` and `B[t]` is
-    `A[t] ∪ B[t]`.  Unless otherwise specified, all JSON-LD terms are
-    sets. 
-  * If `t` is a `@list`, then the composition of `A[t]` and `B[t]` is 
-    `A[t] + B[t]`.
-  * The schema implementation should support override semantics.
-    That is, the composition of `A[t]` and `B[t]` is:
-      * `A[t]`, if `B[t]` is nil
-      * `B[t]`, if `B[t]` is not nil
+| Value 1 | Value 2 | Composition |
+| ------- | ------- | ----------- |
+| A       | [A, B]  | [A, B]      |
+| A       | B       | [A, B]      |
+| A       | [B, C]  | [A, B, C]   |
+
+  * List composition: The list composition of two terms is the
+    concatenation of the values of the second term to the first. For
+    example:
+    
+| Value 1 | Value 2 | Composition |
+| ------- | ------- | ----------- |
+| A       | [A, B]  | [A, A, B]   |
+| A       | B       | [A, B]      |
+| A       | [B, C]  | [A, B, C]   |
+
+  * Override composition: The value of the second term overrides the
+    first. For example:
+    
+| Value 1 | Value 2 | Composition |
+| ------- | ------- | ----------- |
+| A       | [A, B]  | [A, B]      |
+| A       | B       | [B]         |
+| A       | [B, C]  | [B, C]      |
+
+   * No composition: The value of the first term remains. For example:
+   
+| Value 1 | Value 2 | Composition |
+| ------- | ------- | ----------- |
+| A       | [A, B]  | [A]         |
+| A       | B       | [A]         |
+| A       | [B, C]  | [A]         |
       
-      
-#### Examples
-
-Set/List composition:
-
-```
-A: {
-  "@id": "attr1",
-  "setTerm": [ "a", "b" ],
-  "listTerm" : 1
-}
-
-B: {
-  "@id": "attr1",
-  "setTerm": [ "a", "c"],
-  "listTerm": [ 1, 2 ]
-}
-
-Composition of A and B: {
-  "@id": "attr1",
-  "setTerm": ["a", "b", "c"],
-  "listTerm": [1, 1, 2]
-}
-```
-
-Override:
-```
-A: {
-  "@id": "attr1",
-  "value": "a"
-}
-
-B: {
-  "@id": "attr1",
-  "value": "b"
-}
-
-Composition of A and B: {
-  "@id": "attr1",
-  "value": "b"
-}
-
-Composition of B and A: {
-  "@id": "attr1",
-  "value": "a"
-}
-```
 
 ### Algorithm
 
-In the following algorithm to compute composition of layers, the
-`attr.path` refers to the sequence of `@id`s of attributes starting from
-the root attribute node to the attribute `attr`.
+This algorithm composes the `source` layer into `target` layer. The
+result is the `target` layer. The algorithm recursively processes the
+source attributes, find the matching target attribute and composes the
+two.
+
+For a given `source` attribute `sourceAttr`, the `path(sourceAttr)`
+refers to the sequence of attribute id's from `sourceAttr` to the
+layer root. For example:
+```
+{
+  "@id": "a",
+  "@type": "Object",
+  "attributes": {
+     "b": {
+       "@type":"Object",
+       "attributes": {
+         "c": {}
+       }
+     }
+  }
+}
+```
+Above, `path(a) = a`, `path(b) = `a.b`, and `path(c) = a.b.c`.
+
+In the below algorithm, an overlay node `o` matches the base layer
+node `b` if `path(o)` is a suffix of `path(b)`. 
+
 
 ```
-ComposeLayers(options,target,source)
+ComposeNode(target,source)
   ComposeTerms(target,source)
-  For each sourceAttr in source.attributes processed depth-first
-    Find targetAttr such that targetAttr.path has sourceAttr.path as a suffix
-    ComposeAttribute(options,targetAttr,sourceAttr)
+  For each source attribute node s
+    Find target node t such that path(t) has path(s) as a suffix
+    ComposeNode(t,s)
 
-  If options.Union
-    Add all source attributes that are not in target into target
+  Add all source non-attributes nodes emanating from s into t
 ```
 
 This algorithm allows defining overlays that contains only the leaf
@@ -133,24 +124,29 @@ nodes without the intermediate steps. For example:
 ```
 {
   "@type": "Schema",
-  "attributes": {
-    "obj": {
-      "@type": "Object",
-      "attributes": {
-         "nestedAttr": {
-            "@type": "Value"
-         }
-      }
+  "layer": {
+    "@type": "Object",
+    "attributes": {
+      "obj": {
+        "@type": "Object",
+        "attributes": {
+           "nestedAttr": {
+              "@type": "Value"
+           }
+        }
     }
   }
 }
 
 {
   "@type": "Overlay",
-  "attributes": {
-    "nestedAttr": {
-      "@type":"Value",
-      "descr": "description"
+  "layer": {
+    "@type": "Object",
+    "attributes": {
+      "nestedAttr": {
+        "@type":"Value",
+        "descr": "description"
+      }
     }
   }
 }
@@ -162,53 +158,21 @@ The `nestedAttr` in the overlay has path `nestedAttr`, which matches
 ```
 {
   "@type": "Schema",
-  "attributes": {
-    "obj": {
-      "@type": "Object",
-      "attributes": {
-         "nestedAttr": {
-            "@type": "Value",
-            "descr": "description"
-         }
+  "layer": {
+    "@type": "Object",
+    "attributes": {
+      "obj": {
+        "@type": "Object",
+        "attributes": {
+           "nestedAttr": {
+              "@type": "Value",
+              "descr": "description"
+           }
+        }
       }
     }
   }
 }
-```
-
-Same is also true for the following overlay with path `obj.nestedAttr`:
-
-```
-{
-  "@type": "Overlay",
-  "attributes": {
-    "obj": {
-      "@type": "Object",
-      "attributes": {
-         "nestedAttr": {
-           "@type":"Value",
-           "descr": "description"
-         }
-      }
-    }
-  }
-}
-```
-
-The `ComposeAttribute` algorithm computes the composition of all
-annotations, and recursively composes nested attributes. The types of
-the attributes must agree. An overlay cannot redefine an attribute
-using the same id with a different `@type`.
-
-```
-ComposeAttribute(options,target,source)
-  ComposeTerms(target,source)
-  
-  switch target.Type:
-    Object: ComposeAttributes(options,target.attributes,source.attributes)
-    Array: ComposeAttribute(options,target.items,source.items)
-    Composite: ComposeAttribute for all matching attributes
-    Polymorphic: ComposeAttribute for all matching attributes
 ```
 
 ## Slicing

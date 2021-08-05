@@ -7,9 +7,10 @@ draft: false
 images: []
 ---
 
-Contact us to learn more about layered schemas. We can help you
-integrate layered schemas into your applications and provide scalable
-components customized for your specific use cases.
+Layered schemas is developed by [Cloud Privacy Labs](https://cloudprivacylabs.com). We provide
+commercial support and consulting services to help you integrate
+layered schemas into your applications. We also offer scalable
+enterprise-grade components customized for your specific use cases.
 
 Cloud Privacy Labs <br>
 5500 Greenwood Plaza Blvd<br>

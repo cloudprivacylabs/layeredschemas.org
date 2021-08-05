@@ -12,445 +12,488 @@ developed, but the basic structure is not likely to change.
 Use the  [GitHub](https://github.com/cloudprivacylabs/lsa-spec) repository to contribute.
 {{% /status %}}
 
-## Schemas and Overlays
+## Basic Concepts
 
-A layer can either be a `Schema` or an `Overlay`. A layer has the
-following structure:
+A layered schema itself is a labeled property graph. A layered schema
+with that defines an object with two attributes can be represented as
+follows:
+
+(`ls` is an alias for `https://lschema.org/`):
+
+![Minimal layered schema](../minimal-layered-schema.svg)
+
+The first node of the schema has the identifier `schemaId`, which is
+also the unique identifier of the schema. The type of the node is
+`https://lschema.org/Schema`. The `targetType` is defined to be
+`https://example.org/SomeObject`, which is the type of the object
+defined by this schema. This node is connected to the `layerId` node
+using `ls:layer`. That means, the `layerId` node defines a layer, and
+since the source node is of type `ls:Schema`, this is a schema
+layer. The layer is of type `ls:Object`, `ls:Attribute`, and
+`https://example.org/SomeObject`. This means that the defined object
+is a schema attribute, as well as an object (a set of key-value
+pairs), and `https://example.org/SomeObject`. This schema has two
+attributes, `attr1` and `attr2`, both of which are defined as
+`ls:Value`, meaning the these attributes are a sequence of bytes, and
+can be strings, integers, etc. At this point, the schema does not
+define what type of data these attributes are.
+
+This graph can be represented as the following JSON-LD object:
 
 ```
 {
-  "@context": "http://layeredschemas.org/ls.jsonld",
-  "@type": "Schema", or "Overlay",
-  "@id": "http://layeredschemas.org/exampleSchema",
-  "targetType": "http://example.org/SomeObject",
-  "attributes": [
-    {
-      "@id": "attribute id",
-      "@type": "Value",
-      .. // other annotations
-    },
-    ...
-  ]
+  "@context": "https://lschema.org/ls.json",
+  "@type": "Schema",
+  "@id": "schemaId",
+  "targetType": "https://example.org/SomeObject",
+  "layer": {
+    "@id": "layerId",
+    "@type": ["Attribute", "Object", "https://example.org/SomeObject"],
+    "attributes": [
+      {
+        "@id": "attr1",
+        "@type": ["Attribute", "Value"]
+      },
+      {
+        "@id": "attr2",
+        "@type": ["Attribute", "Value"]
+      }
+     ]
+  }
 }
 ```
-Or:
+
+This is a direct representation of the graph using JSON-LD. Some of
+the information in this schema can be inferred. For instance, all
+elements of `attributes` have type `Attribute`, so the type definition
+for `Attribute` can be omitted. Similarly, any object containing
+`attributes` is an `Object`, so it can be omitted as well.
+
+An `Overlay` can be used to assign additional information to this
+schema. For instance, the following overlay defined JSON keys and
+types for the attributes:
 
 ```
 {
-  "@context": "http://layeredschemas.org/ls.jsonld",
-  "@type": "Schema", or "Overlay",
-  "@id": "http://layeredschemas.org/exampleSchema",
-  "targetType": "http://example.org/SomeObject",
-  "attributeList": [
-    {
-      "@id": "attribute id",
-      "@type": "Value",
-      .. // other annotations
-    },
-    ...
-  ]
-}
-```
-
-### `@context`
-
-The layered schemas context is used to expand the schema. This
-context defines the expanded terms for the schema attributes and
-schema structure. If the schema includes semantic annotations not
-defined in this context, additional contexts can be specified as an
-array.
-
-### `@type`
-
-This is a `Schema` object. Valid values are:
-
- * `Schema` or `http://layeredschemas.org/Schema`
- * `Overlay` or `http://layeredschemas.org/Overlay`
- 
- Note that this notation declares the JSON-LD node type as a schema or
- overlay.
-
-### `@id`
-
-The schema identifier. The id is usage specific, it can be a
-globally unique identifier, or an identifier meaningful for the
-domain schema is used in. This identifier can be used to define
-references to the schema, and should be unique for the domain.
-  
-Note that this notation declares the JSON-LD node id as the schema
-identifier.
-  
-### `targetType` 
-
-`@id: http://layeredschemas.org/targetType`<br>
-`@type: @id`
-
-The type(s) of the object defined by the schema, or the overlay.
-  
-A `targetType` is mandatory for a schema. It is optional for an
-overlay. An overlay without a `targetType` can be composed with any
-other layer.
-
-### `attributes`
-
-`@id: http://layeredschemas.org/Object/attributes`<br>
-`@container: @id`<br>
-
-The attributes of the object defined by this schema. It is an idmap,
-so attributes can be defined as an array of attributes as a JSON
-object. That is, both of the following definitions are valid:
-
-```
-"attributes": [
-  { 
-    "@id": "attr1"
-  },
-  { 
-    "@id": "attr2" 
-  },
-  ...
-]
-```
-
-```
-"attributes": {
-  "attr1": {},
-  "attr2": {},
-  ...
-}
-```
-
-The order of attributes are not significant, and not necessarily preserved.
-
-### `attributeList`
-
-`@id: http://layeredschemas.org/Object/attributeList`<br>
-`@container: @list`<br>
-
-The attributes of the object defined by this schema. A schema can either have `attributes` or `attributeList`.
-`attributeList` is a list container, meaning the ordering of attributes are significant:
-
-```
-"attributeList": [
-  { 
-    "@id": "attr1"
-  },
-  { 
-    "@id": "attr2" 
-  },
-  ...
-]
-```
-### Expanded Layer Model
-
-Layered schema implementations must work with the following expanded
-JSON-LD representation. Below is the model for `Schema`. `Overlay`
-uses the same model with the corresponding `@type`:
-
-```
-[
-  {
-    "@type": [
-      "http://layeredschemas.org/Schema"
-    ],
-    "http://layeredschemas.org/targetType": [
+  "@context": "https://lschema.org/ls.json",
+  "@type": "Overlay",
+  "@id": "overlayId",
+  "targetType": "https://example.org/SomeObject",
+  "layer": {
+    "@id": "layerId",
+    "@type": ["Attribute", "Object", "https://example.org/SomeObject"],
+    "attributes": [
       {
-        "@id": "objType"
-      }
-    ],
-    "http://layeredschemas.org/Layer/objectVersion": [
-      {
-        "@value": "objVersion"
-      }
-    ],
-    "http://layeredschemas.org/Object/attributes": [
-      {
-        "@id": "idValue",
-        "@type": [
-          "http://layeredschemas.org/Value"
-        ]
+        "@id": "attr1",
+        "attributeName": "name1",
+        "attributeType": "string"
       },
       {
-        "@id": "idObject",
-        "@type": [
-          "http://layeredschemas.org/Object"
-        ],
-        "http://layeredschemas.org/Object/attributes": []
-      },
-      {
-        "@id": "idReference",
-        "@type": [
-          "http://layeredschemas.org/Reference"
-        ],
-        "http://layeredschemas.org/Reference/reference": [
-          {
-            "@id": "http://example.org/reference"
-          }
-        ]
-      },
-      {
-        "@id": "idArray",
-        "@type": [
-          "http://layeredschemas.org/Array"
-        ],
-        "http://layeredschemas.org/Array/items": [
-          {}
-        ]
-      },
-      {
-        "@id": "idComposite",
-        "@type": [
-          "http://layeredschemas.org/Composite"
-        ],
-        "http://layeredschemas.org/Composite/allOf": [
-          {
-            "@list": [
-              {}
-            ]
-          }
-        ]
-      },
-      {
-        "@id": "idPolymorphic",
-        "@type": [
-          "Polymorphic"
-        ],
-        "http://layeredschemas.org/Polymorphic/oneOf": [
-          {
-            "@list": [
-              {}
-            ]
-          }
-        ]
+        "@id": "attr2",
+        "attributeName": "name2",
+        "attributeType": "string"
       }
     ]
   }
-]
-```
-
-## Attribute Types
-
-### Value
-
-`@type: Value` or `@type: http://layeredschemas.org/Value`
-
-A sequence of bytes. Examples are `string`, `int`, `xs:Date`,
-etc. The schema may specify the encoding, format, and architecture
-or representation specific type.
-  
-``` 
-{ 
-  "@id": "attribute1",
-  "@type": "Value" 
 }
 ```
 
-### Object
+When this overlay is composed with the previous schema, the resulting schema is;
+```
+{
+  "@context": "https://lschema.org/ls.json",
+  "@type": "Schema",
+  "@id": "schemaId",
+  "targetType": "https://example.org/SomeObject",
+  "layer": {
+    "@id": "layerId",
+    "@type": ["Attribute", "Object", "https://example.org/SomeObject"],
+    "attributes": [
+      {
+        "@id": "attr1",
+        "@type": ["Attribute", "Value"],
+        "attributeName": "name1",
+        "attributeType": "string"
+      },
+      {
+        "@id": "attr2",
+        "@type": ["Attribute", "Value"],
+        "attributeName": "name2",
+        "attributeType": "string"
+      }
+    ]
+  }
+}
+```
 
-`@type: Object` or `@type: http://layeredschemas.org/Object`
+Graph representation for this schema is:
 
-Key-attribute pairs, similar to a JSON object or an XML element. An
-`Object` attribute has `attributes` that list the nested attributes.
+![Composed minimal layered schema](../composed-minimal-layered-schema.svg)
+
+This schema can be used to process the following JSON document:
 
 ```
 {
-  "@id": "object1",
-  "@type": "Object",
-  "attributes": {
-     "nestedAttr1": {
-       "@type": "Value"
-     },
+   "name1": "value1",
+   "name2": "value2"
+}
+```
+
+When this JSON document is ingested using the above schema, the
+resulting data model is as follows:
+
+![Ingested data using minimal layered schema](../composed-ingested-minimal-schema.svg)
+
+
+### Schema Variants
+
+Data objects can have variations due to differences in locale,
+jurisdiction, API implementation, representation, or conventions. In
+such situations a common schema can be used to describe the common
+attributes, and different overlays can be used to customize the schema
+to a particular variant.
+
+A *schema variant* is a schema combined with zero or more
+overlays. The schema of a variant is called a *schema base*. 
+
+For example, FHIR is a standard format used for the exchange of health
+data. Even though the data elements are standard, the constraints on
+those elements differ from jurisdiction to jurisdiction. Certain
+required attributes in a jurisdiction can be optional in
+another. These are represented using FHIR profiles. The FHIR schema
+can be defined as a layered schema, with jurisdictional profiles
+represented as overlays overriding the common constraints for a
+particular locale. The resulting schema is a variant of the FHIR
+schema with different constraints.
+
+Similarly, a schema can be used to generate data entry
+forms. Different overlays can be used to configure the presentation
+layer using different languages.
+
+### Data Model
+
+A **layer** is a **schema** or an **overlay**. The canonical data
+model a layer is a labeled directed graph, thus, there are multiple
+representations of it. Using JSON-LD, the structure of a layer looks
+like this:
+
+```
+{
+  "@id": "layerId",
+  "@type": "https://lschema.org/Schema",
+  <em>layer metadata</em>
+  "https://lschema.org/layer": {
+     <em>layer specification</em>
+   }
+}
+```
+
+This declares a `Schema` with id `layerId`. Any layer metadata can be
+included in this header section. This metadata will be preserved by
+the composition and slicing algorithms. The actual layer specification
+is given in the `https://lschema.org/layer` object.
+
+The equivalent labeled property graph representation is as follows:
+
+![Data model - layer](../data-model-layer.svg)
+
+### Layer specification
+
+The *layer specification* is the data model of the object that is
+being defined by the schema or that is being modified by the
+overlay. The *layer specification* lists the *attributes* and the
+associated metadata. Each *attribute* is uniquely identified within
+the layer using an `@id`. Each *attribute* has one or more `@type`s
+that specify the stucture of the attribute. These `@type`s determine
+the structure of the data (value, object, array, etc.), not the
+interpretation of its contents (string, int, etc.).
+
+#### Value type
+
+A *Value* is simply a string of bytes whose content will be
+interpreted by a program. The actual underlying value may have parts
+when interpreted (such as a date field with year, month, day parts),
+but as long as the schema processing is concerned, the *Value* field
+is atomic.
+
+A value attribute is declaret in JSON-LD using:
+
+```
+{
+   "@id": "attributeId",
+   "@type": "Value",
+   <em>attribute metadata</em>
+}
+```
+
+When processed, this is expanded to:
+
+```
+{
+   "@id": "attributeId",
+   "@type": ["https://lschema.org/Attribute", "https://lschema.org/Value"],
+   <em>attribute metadata</em>
+}
+```
+
+The type `Value` also implies the type `Attribute`.
+
+Note that the layered schema does not necessarily contain any
+information about the underlying data type. A `Value` attribute is
+simply a sequence of bytes. Additional layers may define semantic
+metadata that denote a more conventional type (such as `string`), but
+how the underlying data is interpreted is up to the program using the
+schema.
+
+
+#### Object type
+
+An *Object* contains a set of named attributes. An object can be used
+to represent a JSON object containing key-value pairs, or an XML
+element containing other elements.
+
+An object has unorderd `attributes`, or ordered `attributeList`. An
+object attribute is declared in JSON-LD using:
+
+```
+{
+   "@id": "attributeId",
+   "@type": "Object",
+   <em>attribute metadata</em>
+   "attributes": {
+     "unordered_attribute_1": {...},
+     "unordered_attribute_2": {...},
      ...
-  }
-}
-```
-
-### Array
-
-`@type: Array` or `@type: http://layeredschemas.org/Object`
-
-An ordered list of attributes. An `Array` attribute has `items` that
-specifies the structure of array items. The following example is a
-value array.
-
-```
-{
-  "@id": "array1",
-  "@type": "Array",
-  "items": {
-    "@id": "arrayElementsID",
-    "@type": "Value"
-  }
-}
-```
-Below is an object array:
-```
-{
-  "@id": "<attributeId>",
-  "@type": "Array",
-  "items": {
-    "@type": "Object",
-    "attributes": {
+   },
+   "attributeList": [
+      { "@id": "ordered_attribute_1", ... },
+      { "@id": "ordered_attribute_2", ... },
       ...
-    }
-  }
+   ]
 }
 ```
 
-### Reference
+When processed, this is expanded to:
 
-`@type: Reference` or `@type: http://layeredschemas.org/Reference`
+```
+{
+   "@id": "attributeId",
+   "@type": [ "https://lschema.org/Attribute", "https://lschema.org/Object"],
+   <em>attribute metadata</em>
+   "https://lschema.org/Object#attributes": [
+     { "@id": "unordered_attribute_1" },
+     { "@id": "unordered_attribute_2" },
+     ...
+   ],
+   "https://lschema.org/Object#attributeList: [
+     { "@id": "ordered_attribute_1", ... },
+     { "@id": "ordered_attribute_2", ... },
+     ...
+   ]
+}
+```
 
-A reference to another object. How this reference is resolved is
-implementation dependent. It can be a [strong reference](#strong-reference) that selects a particular schema
-variant, or a [weak reference](#weak-reference) that will be resolved at run time
-based on the existing context.  The reference can be:
+Note that the type `Object` also implies the type
+`Attribute`. Furthermore, if an attribute is defined without an
+explicit `@type`, but includes `https://lschema.org/Object#attributes`
+or `https://lschema.org/Object#attributeList`, then the processor
+assumes that the attribute is of type `Object`.
+
+The term `attributes` expands to
+`https://lschema.org/Object#attributes` as an `@idmap`. It specifies
+the attributes of the object in an unordered manner, similar to a JSON
+object. When processing data, the attributes defined in the
+`https://lschema.org/Object#attributes` are matched to the schema
+definition ignoring the order they appear.
+
+The term `attributeList` expands to
+`https://lschema.org/Object#attributeList` as a `@list`. It specifies
+the attributes of the object in the given order, similar to an XML
+element containing other elements with a specified order. The
+`attributeList` only specifies a ranking between the defined elements,
+that is there can be additional attributes not specified in the
+`attributeList` in between the ordered elements. For example, if a
+schema is defined using ordered attributes `a b c d`, then the input
+containing attributes `y a b x c w d` conforms to that schema.
+
+#### Array type
+
+An `Array` contains repeated attributes. Array attributes can be used
+to represent JSON arrays, or XML elements (an XML element containing
+other elements can be represented as both an object and an array). The
+array definition contains the attribute specification for the array items:
+
+```
+{
+   "@id": "arrayAttributeId",
+   "@type": "Array",
+   <em>Array metadata</em>,
+   "items": {
+      "@id": "arrayItemsId",
+      "@type": "Value",
+      <em>item metadata</em>
+   }
+}
+```
+
+
+The array items is an attribute definition, and can be of any
+type. Multi-dimensional arrays are supported by defining arrays whose
+items are other arrays.
+
+When processed, this is expanded to:
+
+```
+{
+   "@id": "arrayAttributeId",
+   "@type": [ "https://lschema.org/Attribute", "https://lschema.org/Array"],
+   <em>Array metadata</em>,
+   "https://lschema.org/Array#items": {
+      "@id": "arrayItemsId",
+      "@type": [ "https://lschema.org/Attribute", "https://lschema.org/Value"],
+      <em>item metadata</em>
+   }
+}
+```
+
+The `Array` type implies the `Attribute` type. If an attribute is
+defined without an explicit `Array` type but contains
+`https://lschema.org/Array#items`, then `Array` type is added during
+processing.
+
+#### Reference type
+
+A `Reference` points to another schema. How this reference is resolved
+is implementation dependent. It can be a strong reference that selects
+a definite schema variant, or a weak reference that selects a schema
+based on the context. The reference can be:
 
   * a hash value or some other DRI of a schema,
   * an IRI specifying an object, or a particular version of that object,
   * an IRI specifying a schema,
   * or some other identifier that can be resolved to a schema.
   
-  
 When compiled, the resulting schema will have all `Reference`
 attributes replaced with the actual referenced schema.
-  
+
 ```
 {
-  "@id": "weakref",
-  "@type": "Reference",
-  "reference": "http://example.org/ExampleObject"
+   "@id": "referenceAttributeId",
+   "@type": "Reference",
+   <em>Reference metadata</em>
+   "reference": "reference to a schema variant"
 }
 ```
 
-This is a weak reference to an `ExampleObject` that will be resolved
-based on the current processing context.
+When processed, this is expanded to:
 
 ```
 {
-  "@id": "strongref",
-  "@type": "Reference",
-  "reference": "sha256://748736a7fde293...."
-}
-```
-This is a strong reference that directly addresses a schema variant using its hash.
-
-#### Strong reference
-
-A strong reference to a schema layer or schema resolves to a unique
-object. Strong references use a decentralized resource identifier
-(DRI) scheme to address the object (usually a hash).
-
-```
-{
-  "@type": "Schema",
-  "targetType": "SomeObject",
-  "layers": [
-     "sha256:a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447"
-  ]
+   "@id": "referenceAttributeId",
+   "@type": ["https://lschema.org/Attribute", "https://lschema.org/Reference"],
+   <em>Reference metadata</em>
+   "https://lschema.org/Reference#reference": "reference to a schema variant"
 }
 ```
 
-This is a valid reference only if the referenced object is a layer or
-another schema, and it has a compatible `targetType`.
 
-Similarly:
+#### Composite type
+
+A `Composite` attribute is a composition of other attributes. When a
+schema containing composite attributes is compiled, all such
+attributes are converted into `Object`s by combining the contents of
+its components.
+
+A composite attribute is defined as:
 
 ```
 {
-  "@type": "Layer",
-  "targetType": "SomeObject",
-  "attributes": {
-    "attr1": {
-       "reference": "sha256:a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447"
-    } 
-  }
+   "@id": "compositeAttibuteId",
+   "@type": "Composite",
+   <em>attribute metadata</em>,
+   "allOf": [
+     {attr1},
+     {attr2},
+     ...
+   ]
 }
 ```
 
-This reference is valid only if it points to a schema. That schema can
-be for a different type of object.
-
-#### Weak reference
-
-A weak reference is any kind of reference to another object that can
-resolve to multiple objects.
-
-This kind of reference may refer to multiple schemas:
+When processed, this is expanded to:
 
 ```
 {
-  "@type": "Schema",
-  "targetType": "SomeObject",
-  "layers": [
-     "http://example.org/SomeObject/layer/v1.2"
-  ]
+   "@id": "compositeAttibuteId",
+   "@type": ["https://lschema.org/Attribute", "https://lschema.org/Composite"],
+   <em>attribute metadata</em>,
+   "https://lschema.org/Composite#allOf"": [
+     {attr1},
+     {attr2},
+     ...
+   ]
 }
 ```
 
-The schema registry can resolve this link based on its own
-configuration. For instance, if a registry allows only unique version
-numbers, the above link would resolve to a definite schema. The link
-resolution can be dependent on the processing context. For instance,
-when processing data in a specific jurisdiction, layers tagged with
-that jurisdiction can be selected.
-
-
-### Composite
-
-`@type: Composite` or `@type: http://layeredschemas.org/Composite`
-
-A composition of multiple attributes. The result of a composition is
-an `Object`, so the elements of a composition are limited to `Value`,
-`Object`, and `Reference` types.
+When the schema is compiled, the elements under `allOf` term are
+combined to form a new object. For the input:
 
 ```
 {
-  "@id": "compositeAttr",
-  "@type": "Composite",
-  "allOf": [
+   "@id": "compositeAttributeId",
+   "@type": "Composite",
+   "allOf": [
      {
-       "@id":"part1",
-       "@type": "Reference",
-       "reference": "http://example.org/SomeObject"
-     },
-     {
-       "@id": "part2",
        "@type": "Object",
        "attributes": {
-          "attr1": {
-             "@type": "Value"
-          },
-          "attr2": {
-             "@type": "Value
-          }
-        }
+          <em>object attributes</em>
+       }
      },
      {
-       "@id": "part3",
-       "@type": "Value"
+       "@type": "Value",
+       "@id": "valueId"
+     },
+     {
+       "@type": "Array",
+       "items": {
+          <em>array items</em>
+       }
      }
-  ]
+   ]
+}
+```
+The output is:
+```
+{
+   "@id": "compositeAttributeId",
+   "@type": "Object",
+   "attributes": {
+      <em>object attributes</em>
+     {
+       "@type": "Value",
+       "@id": "valueId"
+     },
+     {
+       "@type": "Array",
+       "items": {
+          <em>array items</em>
+       }
+     }
+   }
 }
 ```
 
-When compiled, all `Composite` attributes are replaced with `Object`
-attributes containing all the attributes of the composite attribute. In
-the above example, the `compositeAttr` will be an `Object` containing
-all attributes of `SomeObject`, `attr1`, `attr2`, and `part3`.
+If there are any nested `Reference` or `Composite` attributes in a
+`Composite` attributes, those are processed first.
 
-### Polymorphic
+### Polymorphic type
 
-`@type: Polymorphic` or `@type: http://layeredschemas.org/Polymorphic`
-
-A polymorphic type that can be one of the types listed in the
-attribute definition. This type of attribute requires constraint
-annotations to decide the actual type of the object at
-run time.
+A `Polymorphic` attribute can be one of the types of attributes listed
+in its definition. A polymorphic attribute requires constraints to
+decide the actual type of the object at run time.
   
 ```
 {
-  "@id": "polyAttr",
+  "@id": "polyAttributeId",
   "@type": "Polymorphic",
   "oneOf": [
      {
@@ -458,162 +501,115 @@ run time.
        "reference": "sha256://2566efadfe9843..."
      },
      {
-       "@type": "Reference",
-       "reference": "sha256://874658d0a9e8f.."
+       "@type": "Object",
+       "attributes": {
+         ...
+       }
      }
   ]
 }
 ```
 
-This attribute can be one of two types defined by strong
-references. When data object is ingested using this schema, the
-`polyAttr` attribute will be checked if any one of the options
-validate the input data. If one of them validates, then the type is
-decided and the selected schema will be used to process the
-attribute. If none matches, or more than one option matches, an error
-will be raised.
+When processed, this is expanded to:
+
+```
+{
+  "@id": "polyAttributeId",
+  "@type": [ "https://lschema.org/Attribute", "https://lschema.org/Polymorphic"],
+  "https://lschema.org/Polyorphic#oneOf": [
+     {
+       "@type": [ "https://lschema.org/Attribute", "https://lschema.org/Reference"],
+       "https://lschema.org/Reference#reference": "sha256://2566efadfe9843..."
+     },
+     {
+       "@type": [ "https://lschema.org/Attribute", "https://lschema.org/Object"],
+       "https://lschema.org/Object#attributes": {
+         ...
+       }
+     }
+  ]
+}
+```
+
+This attribute can be one of two types defined by the reference or the
+object. When a data object is ingested using this schema, the
+corresponding input will be checked if any one of the options validate
+the input data. If one of them validates, then the type is decided and
+the selected schema will be used to process the attribute. If none of
+the options validate the schema, or more than one option matches, an
+error will be raised.
 
 
 ## Schema Manifest
 
-A `SchemaManifest` object defines how a particular variant of a data
-object is composed from its layers.
+A `SchemaManifest` defines how a particular variant of a data object
+is composed from its layers.
 
 ```
 {
-  "@context": "https://layeredschemas.org/ls.jsonld",
+  "@context": "https://lschema.org/ls.json",
   "@type": "SchemaManifest",
-  "@id": "<unique identifier for the schema defined by this manifest>",
-  "publishedAt": "<schema publish date>",
-  "targetType": "<the object type defined by this schema>",
-  "bundle": "<the bundle containing all valid layers and references>",
-  "schema": "<reference to the schema">,
+  "@id": <em>unique identifier for the schema variant defined by this manifest</em>,
+  "targetType": <em>the object defined by the schema</em>,
+  "bundle": <em>the bundle containing all valid layers and references</em>,
+  "schema": <em>reference to the schema</em>,
   "overlays": [
-     "reference to overlay1",
-     "reference to overlay2",
+     <em>reference to overlay1</em>,
+     <em>reference to overlay2</em>,
      ...
    ]
 }
 ```
 
-### `@type`
-
-The type of this JSON-LD object is a
-`http://layeredschemas.org/SchemaManifest`.
-
-### `@id`
-
-The unique ID for this schema variant.
-
-###  `publishedAt`
-
-`@type: http://schema.org/Date`<br>
-`@id: http://layeredschemas.org/SchemaManifest/publishedAt`
-
-The schema variant publish date.
-
-### `targetType`
-
-`@type: @id`<br>
-`@id: http://layeredschemas.org/targetType`
-
-The type(s) of the object defined by this schema. There can be many
-schemas defining different variants of the same data object. 
-
-### `bundle`
-
-`@type: @id`<br>
-`@id: http://layeredschemas.org/SchemaManifest/bundle`
-
-Points to a [schema bundle](#schema-bundle) containing 
-[strong references](#strong-reference)
-for layers and schemas to resolve all [weak references](#weak-reference).
-
-### `schema`
-
-`@type: @id`<br>
-`@id: http://layeredschemas.org/SchemaManifest/schema`
-
-
-Points to the schema. The schema must be of type `Schema` and declare
-the same object type as the schema manifest.
-
-### `overlays`
-
-`@type: @id`<br>
-`@container: @list` <br>
-`@id: http://layeredschemas.org/SchemaManifest/overlays`
-
-An ordered list of layers composing the schema. Each layer must be of
-type `Overlay`, and declare a compatible `targetType` as the schema manifest.
-
-### Expanded Schema Manifest Model
-
-Layered schema implementations must work with the following expanded
-JSON-LD representation. 
-
-```[
-  {
-    "@type": [
-      "http://layeredschemas.org/SchemaManifest"
-    ],
-    "http://layeredschemas.org/targetType": [
-      {
-        "@value": "objType"
-      }
-    ],
-    "http://layeredschemas.org/SchemaManifest/publishedAt": [
-      {
-        "@value": "20210320T00:00:00Z"
-      }
-    ],
-    "http://layeredschemas.org/SchemaManifest/bundle": [
-      {
-        "@id": "sha256://27634767a887e887f8e87..."
-      }
-    ],
-    "http://layeredschemas.org/SchemaManifest/schema": [
-      {
-        "@id": "sha256://5878a8e8faa9890..."
-      }
-    ],
-    "http://layeredschemas.org/SchemaManifest/overlays": [
-      {
-        "@list": [
-          {
-            "@id": "sha256://587376a7676f767..."
-          },
-          {
-            "@id": "sha256://ee538866547676f767..."
-          }
-        ]
-      }
-    ]
-  }
-]
-
+When processed, this becomes:
+```
+{
+  "@type": ["https://lschema.org/SchemaManifest]",
+  "@id": <em>unique identifier for the schema variant defined by this manifest</em>,
+  "https://lschema.org/targetType": <em>the object defined by the schema</em>,
+  "https://lschema.org/SchemaManifest#bundle": <em>the bundle containing all valid layers and references</em>,
+  "https://lschema.org/SchemaManifest#schema": <em>reference to the schema</em>,
+  "https://lschema.org/SchemaManifest#overlays": [
+     <em>reference to overlay1</em>,
+     <em>reference to overlay2</em>,
+     ...
+   ]
+}
 ```
 
-## Schema Bundle
+The `targetType` specifies the object that is being defined by the
+schema. There can be many schema manifests defining different variants
+of the same data object.
 
+The `bundle` points to a *schema bundle* containing strong references
+for all layers and schemas that should be used to compile the schema.
+
+The `schema` points to the schema base. The schema must be of type
+`Schema` and declare the same object type as the schema manifest.
+
+The `overlays` is an ordered list of layers composing the schema. Each
+layer must be of type `Overlay`, and declare a compatible `targetType`
+as the schema manifest.
+
+
+## Schema Bundle
 
 A schema `Bundle` links a group of schema layers together so the
 references to the layers in a schema manifest and references to
 objects in schemas can be resolved unambiguously. In other words, a
-`Bundle` is a mechanism to convert [weak
-references](#weak-reference) into [strong
-references](#weak-reference).
+`Bundle` is a mechanism to convert weak references to strong
+references.
 
 ```
 {
-  "@context": "https://layeredschemas.org/ls.jsonld",
+  "@context": "https://layeredschemas.org/ls.json",
   "@type": "Bundle",
-  "@id": "<unique identifier for the schema bundle>",
+  "@id": <em>unique identifier for the schema bundle</em>",
   "references": {
-     "weak-reference": "strong-reference",
-     "weak-reference": [
-          "strong-reference",
-          "strong-reference",
+     <em>weak-reference</em>: <em>strong-reference</em>,
+     <em<weak-reference</em>: [
+          <em>strong-reference</em>,
+          <em>strong-reference<em>,
           ...
        ]
      }
@@ -621,19 +617,6 @@ references](#weak-reference).
 }
 ```
 
-### `@type`
+Each element of `references` specifies one or more strong
+references for each weak reference.
 
-The type of this JSON-LD object is a
-`http://layeredschemas.org/Bundle`.
-
-### `@id`
-
-The unique ID for this schema bundle.
-
-### `references`
-
-`@id: http://layeredschemas.org/Bundle/references`</br>
-`@container: @id`
-
-Specifies one or more [strong references](#strong-reference) for each [weak
-reference](#weak-reference).

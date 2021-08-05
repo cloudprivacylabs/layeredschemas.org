@@ -43,6 +43,11 @@
   url = "https://github.com/cloudprivacylabs/lsa"
   post = "v0.1.0"
   weight = 20
+[[social]]
+  name = "Cloud Privacy Labs"
+  url = "https://cloudprivacylabs.com"
+  pre = "<b>Cloud Privacy Labs</b>"
+  weight = 30
 
 [[footer]]
   name = "This site does not use cookies."

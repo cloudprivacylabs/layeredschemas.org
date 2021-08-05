@@ -8,7 +8,7 @@ toc: false
 description: An overview of layered schemas, examples, syntax, composing and slicing
 ---
 
-A **schema** describes data. This is a JSON schema:
+A traditional **schema** describes the shape of data. This is a JSON schema:
 
 ```
 {
@@ -56,15 +56,18 @@ data. The above schema can be written as:
 
 ```
 {
+  "@context": "https://layeredschemas.org/ls.json",
   "@type": "Schema",
-  "attributes": {
-    "firstName": {
-       "@type": "Value",
-       "type": "string",
-    },
-    "age": {
-       "@type": "Value",
-       "type": "number"
+  "layer": {
+    "attributes": {
+      "firstName": {
+         "@type": "Value",
+         "type": "string",
+      },
+      "age": {
+         "@type": "Value",
+         "type": "number"
+      }
     }
   }
 }
@@ -80,17 +83,20 @@ into this schema by defining a new term, `privacyClassifications`:
 
 ```
 {
+  "@context": ["https://layeredschemas.org/ls.json", {"@vocab":"https://example.org/"}],
   "@type": "Schema",
-  "attributes": {
-    "firstName": {
-       "@type": "Value",
-       "type": "string",
-       "privacyClassifications": ["PII"]
-    },
-    "age": {
-       "@type": "Value",
-       "type": "number",
-       "privacyClassifications": ["PII"]
+  "layer": {
+    "attributes": {
+      "firstName": {
+         "@type": "Value",
+         "type": "string",
+         "privacyClassifications": ["PII"]
+      },
+      "age": {
+         "@type": "Value",
+         "type": "number",
+         "privacyClassifications": ["PII"]
+      }
     }
   }
 }
@@ -99,51 +105,59 @@ into this schema by defining a new term, `privacyClassifications`:
 This type of extensions to the core schema language is possible
 because layered schema specification describes how to define
 purpose-built terminologies and the semantics for its terms, and how
-to incorporate it into the schema ecosystem. In this case,
-`privacyClassifications` is a term that uses set semantics.
+to incorporate it into the schema ecosystem. 
 
 We can now **slice** this schema into layers. We can put the `type` and
 `privacyClassification` annotations into separate overlays.
 
 ```
 {
+  "@context": "https://layeredschemas.org/ls.json",
   "@type": "Schema",
-  "attributes": {
-    "firstName": {
-      "@type": "Value"
-    },
-    "age": {
-      "@type": "Value"
+  "layer": {
+    "attributes": {
+      "firstName": {
+        "@type": "Value"
+      },
+      "age": {
+        "@type": "Value"
+      }
     }
   }
 }
 
 {
+  "@context": "https://layeredschemas.org/ls.json",
   "@type": "Overlay",
-  "attributes": {
-    "firstName": {
-       "@type": "Value",
-       "type": "string"
-    },
-    "age": {
-       "@type": "Value",
-       "type": "number"
+  "layer": {
+    "attributes": {
+      "firstName": {
+         "@type": "Value",
+         "type": "string"
+      },
+      "age": {
+         "@type": "Value",
+         "type": "number"
+      }
     }
   }
 }
 
 {
-  "@type": "Overlay",
-  "attributes": {
-    "firstName": {
-       "@type": "Value",
-       "privacyClassifications": ["PII"]
-    },
-    "age": {
-       "@type": "Value",
-       "privacyClassifications": ["PII"]
-    }
-  }
+ "@context": ["https://layeredschemas.org/ls.json", {"@vocab":"https://example.org/"}],
+ "@type": "Overlay",
+ "layer": {
+   "attributes": {
+     "firstName": {
+        "@type": "Value",
+        "privacyClassifications": ["PII"]
+     },
+     "age": {
+        "@type": "Value",
+        "privacyClassifications": ["PII"]
+     }
+   }
+ }
 }
 ```
 
@@ -152,17 +166,22 @@ overlay:
 
 ```
 {
-  "@type": "Schema",
-  "attributes": {
-    "firstName": {
-       "@type": "Value",
-       "privacyClassifications": ["PII"]
-    },
-    "age": { 
-       "@type": "Value",
-       "privacyClassifications": ["PII"]
-    }
-  }
+  "@type": "https://lschema.org/Schema",
+  "https://lschema.org/layer": {
+    "@type": [
+       "https://lschema.org/Object",
+       "https://lschema.org/Attribute"],
+       "https://lschema.org/attributes": {
+         "firstName": {
+            "@type": "https://lschema.org/Value",
+            "https://example.org/privacyClassifications": ["PII"]
+         },
+         "age": { 
+            "@type": "https://lschema.org/Value",
+            "privacyClassifications": ["PII"]
+         }
+       }
+   }
 }
 ```
 
@@ -177,25 +196,36 @@ Now, we can **ingest** the following data object using this schema:
 
 The result of this process is:
 ```
-{
-  "firstName": {
-     "@type": "Value",
-     "name": "firstName",
-     "privacyClassifications": ["PII"]
-     "value": "John",
-  },
-  "age": {
-     "@type": "Value",
-     "name": "age",
-     "privacyClassifications": ["PII"]
-     "value": 21
-  }
+{ 
+  "@graph": [
+    {
+      "@id": "firstName",
+      "@type": [ "https://lschema.org/DocumentValue"],
+      "https://lschema.org/attributeName": "firstName",
+      "https://lschema.org/attributeValue": "John",
+      "https://example.org/privacyClassifications": ["PII"]
+      "https://lschema.org/data#instanceOf": {
+        "@id": "http://example.org/Person/firstName"
+       }
+    },
+    {
+      "@id": "age",
+      "@type": [ "https://lschema.org/DocumentValue"],
+      "https://lschema.org/attributeName": "age",
+      "https://lschema.org/attributeValue": "21",
+      "https://example.org/privacyClassifications": ["PII"]
+      "https://lschema.org/data#instanceOf": {
+        "@id": "http://example.org/Person/age"
+       }
+    }
+  ]
 }
 ```
 
-The result of data ingestion is this linked object containing the
-input values as well as all the semantic annotations declared in the
-schema used to ingest the data. An application can work with this data
+The result of data ingestion is this graph containing the input values
+as well as all the semantic annotations declared in the schema used to
+ingest the data. Each data element also contains a link to the
+corresponding schema element. An application can work with this data
 without an explicit knowledge of the schema used to ingest it.
 
 Suppose the data is ingested from a system with limitations on string
@@ -204,11 +234,13 @@ lengths. This can be represented using an overlay:
 ```
 {
   "@type": "Overlay",
-  "attributes": {
-     "firstName": {
-        "@type": "Value",
-        "maxLength": 32
-     }
+  "layer": {
+    "attributes": {
+       "firstName": {
+          "@type": "Value",
+          "maxLength": 32
+       }
+    }
   }
 }
 ```
@@ -218,19 +250,23 @@ A new schema can be composed by adding this overlay:
 ```
 {
   "@type": "Schema",
-  "attributes": {
-    "firstName": {
-       "@type": "Value",
-       "privacyClassifications": ["PII"],
-       "maxLength": 32
-    },
-    "age": { 
-       "@type": "Value",
-       "privacyClassifications": ["PII"]
-    }
+  "layer": {
+    "attributes": {
+      "firstName": {
+         "@type": "Value",
+         "privacyClassifications": ["PII"],
+         "maxLength": 32
+      },
+      "age": { 
+         "@type": "Value",
+         "privacyClassifications": ["PII"]
+      }
+    } 
   }
 }
 ```
 
-When data is ingested using this schema, the `maxLength: 32` constraint will be validated, and data ingestion will fail if the `firstName` is longer than 32.
+When data is ingested using this schema, the `maxLength: 32`
+constraint will be validated, and data ingestion will fail if the
+`firstName` is longer than 32.
   
