@@ -1,6 +1,10 @@
 ---
 title : "Layered Schemas for data capture, processing, and exchange"
 lead: "Enable semantic processing for structured data. Improve interoperability between heterogeneous systems."
+actionButton:
+  url: https://playground.layeredschemas.org
+  text: Launch the Layered Schema Playground
+  help: The layered schema playground is a web-based application to test schemas. You can experiment with sample schemas, or build schemas of your own and see how data ingestion and presentation works.
 date: 2021-04-20T08:47:36+00:00
 lastmod: 2021-04-20T20:24:36+00:00
 draft: false
