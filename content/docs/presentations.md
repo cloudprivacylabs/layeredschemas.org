@@ -8,3 +8,4 @@ menu:
 ---
 
  * [Semantic Interoperability with Layered Schemas and Linked Data](../LayeredSchemasforSemanticInteroperability-IIW32.pdf) IIW32, April 21, 2021 [Recorded session](https://eu01web.zoom.us/rec/play/o0m6egh4FMHR5qRvE3WfTmGmTkwZ5l6qmpywatNLn194W1hmk-rL2uDwQO7GNKyemImpwsInR7OVPBgk.CWTxBzVeQUyfRLeZ?continueMode=true)
+ * [Semantic Pipelines with Layered Schemas](../SemanticPipelinesWithLayeredSchemas.pdf) IIW33, October 12, 2021

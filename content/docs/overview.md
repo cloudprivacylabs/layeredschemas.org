@@ -52,7 +52,7 @@ that `firstName` and `age` are personally identifiable
 information. 
 
 Layered schemas use an open-ended schema language to describe
-data. The above schema can be written as:
+data. Using JSON-LD, the above schema can be written as:
 
 ```
 {
@@ -62,11 +62,11 @@ data. The above schema can be written as:
     "attributes": {
       "firstName": {
          "@type": "Value",
-         "type": "string",
+         "valueType": "xsd:string",
       },
       "age": {
          "@type": "Value",
-         "type": "number"
+         "valueType": "json:number"
       }
     }
   }
@@ -76,7 +76,7 @@ data. The above schema can be written as:
 Here, `@type: Value` defines the attribute as a value attribute.  A
 layered schema makes a distinction between attribute kinds like
 `Value`, `Object`, `Array`, etc. Everything else are simply semantic
-annotations. Above, `type: string` is a semantic annotation whose
+annotations. Above, `valueType: string` is a semantic annotation whose
 meaning depends on the system processing it.  For instance, we can add
 the fact that the two fields are personally identifiable information
 into this schema by defining a new term, `privacyClassifications`:
@@ -89,12 +89,12 @@ into this schema by defining a new term, `privacyClassifications`:
     "attributes": {
       "firstName": {
          "@type": "Value",
-         "type": "string",
+         "valueType": "xsd:string",
          "privacyClassifications": ["PII"]
       },
       "age": {
          "@type": "Value",
-         "type": "number",
+         "valueType": "json:number",
          "privacyClassifications": ["PII"]
       }
     }
@@ -105,7 +105,7 @@ into this schema by defining a new term, `privacyClassifications`:
 This type of extensions to the core schema language is possible
 because layered schema specification describes how to define
 purpose-built terminologies and the semantics for its terms, and how
-to incorporate it into the schema ecosystem. 
+to incorporate them into the schema ecosystem. 
 
 We can now **slice** this schema into layers. We can put the `type` and
 `privacyClassification` annotations into separate overlays.
@@ -133,11 +133,11 @@ We can now **slice** this schema into layers. We can put the `type` and
     "attributes": {
       "firstName": {
          "@type": "Value",
-         "type": "string"
+         "valueType": "xsd:string"
       },
       "age": {
          "@type": "Value",
-         "type": "number"
+         "valueType": "json:number"
       }
     }
   }
@@ -227,6 +227,7 @@ as well as all the semantic annotations declared in the schema used to
 ingest the data. Each data element also contains a link to the
 corresponding schema element. An application can work with this data
 without an explicit knowledge of the schema used to ingest it.
+
 
 Suppose the data is ingested from a system with limitations on string
 lengths. This can be represented using an overlay:

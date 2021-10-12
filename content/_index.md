@@ -10,13 +10,13 @@ lastmod: 2021-04-20T20:24:36+00:00
 draft: false
 images: []
 boxes: 
-  -  title: Data Graphs
+  -  title: Labeled Property Graphs
      content: |
-       Traditional schemas define the structure of data. Layered schemas define an abstract data model as a graph.
+       Traditional schemas define the structure of data. Layered schemas define semantics and structure using labeled property graphs.
       
   - title: Interoperability
     content: |
-      Semantic overlays deal with variations in representation, format, locale, semantics, and more.
+      Semantic overlays deal with variations in format, locale specific conventions, and meaning.
       
   - title: Multi-dimensional Metadata
     content: |

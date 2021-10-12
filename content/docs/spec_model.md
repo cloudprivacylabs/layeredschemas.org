@@ -14,9 +14,8 @@ Use the  [GitHub](https://github.com/cloudprivacylabs/lsa-spec) repository to co
 
 ## Basic Concepts
 
-A layered schema itself is a labeled property graph. A layered schema
-with that defines an object with two attributes can be represented as
-follows:
+A layered schema is a labeled property graph. A layered schema that
+defines an object with two attributes can be represented as follows:
 
 (`ls` is an alias for `https://lschema.org/`):
 
